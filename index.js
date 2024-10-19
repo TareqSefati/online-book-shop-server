@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const express = require("express");
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 const app = express();
 
@@ -90,6 +90,67 @@ async function run() {
         res.send(result);
     });
 
+
+    // Database operation for Category
+    const categoryCollection = client.db("DbBootcamp").collection("category");
+
+    // Get all category
+    app.get("/category", async (req, res) => {
+        const query = categoryCollection.find();
+        const result = await query.toArray();
+        res.send(result);
+    });
+
+    //Find one category by id
+    app.get("/category/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log("category id: ",id);
+        const query = { _id: new ObjectId(id) };
+        const result = await categoryCollection.findOne(query);
+        console.log("Category: ", result);
+        res.send(result);
+    });
+
+    //Save a category
+    app.post("/category", async (req, res) => {
+        const category = req.body;
+        console.log("Category: ", category);
+        const result = await categoryCollection.insertOne(category);
+        res.send(result);
+    });
+
+    //Update a category
+    app.put("/category/:id", async (req, res) => {
+        const id = req.params.id;
+        const category = req.body;
+        console.log(id, category);
+  
+        const filter = { _id: new ObjectId(id) };
+        const option = { upsert: true };
+  
+        const updatedCategory = {
+          $set: {
+            name: category.name,
+            photoUrl: category.photoUrl
+          },
+        };
+  
+        const result = await categoryCollection.updateOne(
+          filter,
+          updatedCategory,
+          option
+        );
+        res.send(result);
+    });
+
+    //Delete a category
+    app.delete("/category/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log("Category id:", id);
+        const query = { _id: new ObjectId(id) };
+        const result = await categoryCollection.deleteOne(query);
+        res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
