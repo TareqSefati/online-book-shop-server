@@ -152,6 +152,74 @@ async function run() {
         res.send(result);
     });
 
+    // Database operation for book
+    const bookCollection = client.db("DbBootcamp").collection("book");
+
+    // Get all book
+    app.get("/book", async (req, res) => {
+        const query = bookCollection.find();
+        const result = await query.toArray();
+        res.send(result);
+    });
+
+    //Find one book by id
+    app.get("/book/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log("book id: ",id);
+        const query = { _id: new ObjectId(id) };
+        const result = await bookCollection.findOne(query);
+        console.log("Book: ", result);
+        res.send(result);
+    });
+
+    //Save a book
+    app.post("/book", async (req, res) => {
+        const book = req.body;
+        console.log("Book: ", book);
+        const result = await bookCollection.insertOne(book);
+        res.send(result);
+    });
+
+    //Update a book
+    app.put("/book/:id", async (req, res) => {
+        const id = req.params.id;
+        const book = req.body;
+        console.log(id, book);
+  
+        const filter = { _id: new ObjectId(id) };
+        const option = { upsert: true };
+  
+        const updatedBook = {
+          $set: {
+            name: book.name,
+            author: book.author,
+            photoUrl: book.photoUrl,
+            pages: book.pages,
+            rating: book.rating,
+            category: book.category,
+            publisher: book.publisher,
+            yearOfPublishing: book.yearOfPublishing,
+            synopsis: book.synopsis,
+          },
+        };
+  
+        const result = await bookCollection.updateOne(
+          filter,
+          updatedBook,
+          option
+        );
+        res.send(result);
+    });
+
+    //Delete a book
+    app.delete("/book/:id", async (req, res) => {
+        const id = req.params.id;
+        console.log("Book id:", id);
+        const query = { _id: new ObjectId(id) };
+        const result = await bookCollection.deleteOne(query);
+        res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
