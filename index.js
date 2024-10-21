@@ -172,6 +172,16 @@ async function run() {
         res.send(result);
     });
 
+    //Find books by category
+    app.get("/book/category/:name", async (req, res) => {
+        const categoryName = req.params.name;
+        console.log("Category name: ", categoryName);
+        const query = { category: categoryName };
+        const result = await bookCollection.find(query).toArray();
+        console.log("Categorized Books: ", result);
+        res.send(result);
+    });
+
     //Save a book
     app.post("/book", async (req, res) => {
         const book = req.body;
@@ -200,6 +210,7 @@ async function run() {
             publisher: book.publisher,
             yearOfPublishing: book.yearOfPublishing,
             synopsis: book.synopsis,
+            price: book.price,
           },
         };
   
