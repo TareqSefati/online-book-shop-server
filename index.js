@@ -36,7 +36,7 @@ async function run() {
     });
 
     //Find one user by uid
-    app.get("/user/:uid", async (req, res) => {
+    app.get("/users/:uid", async (req, res) => {
         const uid = req.params.uid;
         console.log(uid);
         const query = { uid: uid };
@@ -54,7 +54,7 @@ async function run() {
     });
 
     //Update a user
-    app.put("/user/:uid", async (req, res) => {
+    app.put("/users/:uid", async (req, res) => {
         const uid = req.params.uid;
         const user = req.body;
         console.log(uid, user);
@@ -82,7 +82,7 @@ async function run() {
     });
 
     //Delete a user
-    app.delete("/user/:uid", async (req, res) => {
+    app.delete("/users/:uid", async (req, res) => {
         const uid = req.params.uid;
         console.log(uid);
         const query = { uid: uid };
@@ -228,6 +228,43 @@ async function run() {
         console.log("Book id:", id);
         const query = { _id: new ObjectId(id) };
         const result = await bookCollection.deleteOne(query);
+        res.send(result);
+    });
+
+    // Database operation for buy book function
+    const buyBookCollection = client.db("DbBootcamp").collection("buyBook");
+    // Get all buyBook
+    app.get("/buy", async (req, res) => {
+        const query = buyBookCollection.find();
+        const result = await query.toArray();
+        res.send(result);
+    });
+
+    //Find one buyBook by _id
+    app.get("/buy/:_id", async (req, res) => {
+        const _id = req.params._id;
+        console.log("Buy book id: ", _id);
+        const query = { _id: new ObjectId(_id) };
+        const result = await buyBookCollection.findOne(query);
+        console.log("Buy Book Entity: ", result);
+        res.send(result);
+    });
+
+    //Find one/multiple buyBook by uid
+    app.get("/buy/uid/:uid", async (req, res) => {
+        const uid = req.params.uid;
+        console.log("User id: ", uid);
+        const query = { uid: uid };
+        const result = await buyBookCollection.find(query).toArray();
+        console.log("Buy Book Entity: ", result);
+        res.send(result);
+    });
+
+    //Save a buyBook 
+    app.post("/buy", async (req, res) => {
+        const buyBook = req.body;
+        console.log("Buy Book: ", buyBook);
+        const result = await buyBookCollection.insertOne(buyBook);
         res.send(result);
     });
 
